@@ -1,21 +1,124 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react"
+import { Text, View, TextInput, Button } from "react-native"
+import { Picker } from "@react-native-picker/picker"
+import styles from "./styles"
 
 export default function App() {
+  const [fromOptions, setFromOptions] = useState([
+    { label: "Decimal", value: "decimal", radix: null },
+    { label: "Hexadecimal", value: "hexadecimal", radix: 16 },
+    { label: "Octal", value: "octal", radix: 8 },
+    { label: "Binary", value: "binary", radix: 2 },
+  ])
+  const [toOptions, setToOptions] = useState([
+    { label: "Decimal", value: "decimal", enabled: false },
+    { label: "Hexadecimal", value: "hexadecimal", enabled: true },
+    { label: "Octal", value: "octal", enabled: true },
+    { label: "Binary", value: "binary", enabled: true },
+  ])
+  const [input, setInput] = useState("")
+  const [result, setResult] = useState("")
+
+  const [convertPick, setConvertPick] = useState({
+    from: "decimal",
+    to: "binary",
+  })
+
+  const handleChooseOption = (item, name) => {
+    const setOption = () =>
+      setConvertPick((prev) => ({ ...prev, [name]: item }))
+
+    if (name === "to") {
+      const itemObj = toOptions.find((option) => option.value === item)
+      if (itemObj.enabled) {
+        setOption()
+      }
+    } else {
+      if (convertPick.to !== item) {
+        setOption()
+
+        setToOptions((prev) =>
+          prev.map((option) => {
+            if (option.value === item) {
+              return { ...option, enabled: false }
+            }
+            return { ...option, enabled: true }
+          })
+        )
+      }
+    }
+  }
+
+  const convertNumber = () => {
+    const { from, to } = convertPick
+    const fromObj = fromOptions.find((option) => option.value === from)
+    const toObj = fromOptions.find((option) => option.value === to)
+
+    if (to === "decimal") {
+      setResult(parseInt(input, fromObj.radix))
+    } else {
+      const num = parseInt(input, fromObj.radix)
+      setResult(num.toString(toObj.radix))
+    }
+  }
+
+  const clearResult = () => {
+    setInput("")
+    setResult("")
+  }
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Text style={styles.title}>NS-Converter</Text>
+      <View style={styles.wrapper}>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={convertPick.from}
+            onValueChange={(item) => handleChooseOption(item, "from")}
+            style={styles.picker}>
+            {fromOptions.map((option) => {
+              return (
+                <Picker.Item
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                />
+              )
+            })}
+          </Picker>
+          <Picker
+            selectedValue={convertPick.to}
+            onValueChange={(item) => handleChooseOption(item, "to")}
+            style={styles.picker}>
+            {toOptions.map((option) => {
+              return (
+                <Picker.Item
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                />
+              )
+            })}
+          </Picker>
+        </View>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            placeholder='Enter number'
+            value={input}
+            onChangeText={setInput}
+            style={styles.input}
+          />
+          <Text style={styles.result}>Result: {result}</Text>
+        </View>
+        <View style={styles.btnContainer}>
+          <View style={styles.btnConvert}>
+            <Button title='Convert' onPress={convertNumber} />
+          </View>
+          <View style={styles.btnClear}>
+            <Button title='Clear' fontSize='24' onPress={clearResult} />
+          </View>
+        </View>
+      </View>
     </View>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
