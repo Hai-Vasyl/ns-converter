@@ -1,7 +1,9 @@
 import React, { useState } from "react"
-import { Text, View, TextInput, Button } from "react-native"
+import { Text, View, TextInput, TouchableOpacity } from "react-native"
 import { Picker } from "@react-native-picker/picker"
 import styles from "./styles"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import Button from "./components/Button"
 
 export default function App() {
   const [fromOptions, setFromOptions] = useState([
@@ -69,13 +71,17 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>NS-Converter</Text>
+      <View style={styles.titleWrapper}>
+        <Icon name='orbit' color='red' size={38} style={styles.titleIcon} />
+        <Text style={styles.title}>NS-Converter</Text>
+      </View>
       <View style={styles.wrapper}>
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={convertPick.from}
             onValueChange={(item) => handleChooseOption(item, "from")}
-            style={styles.picker}>
+            style={styles.picker}
+          >
             {fromOptions.map((option) => {
               return (
                 <Picker.Item
@@ -89,7 +95,8 @@ export default function App() {
           <Picker
             selectedValue={convertPick.to}
             onValueChange={(item) => handleChooseOption(item, "to")}
-            style={styles.picker}>
+            style={styles.picker}
+          >
             {toOptions.map((option) => {
               return (
                 <Picker.Item
@@ -106,17 +113,31 @@ export default function App() {
             placeholder='Enter number'
             value={input}
             onChangeText={setInput}
+            placeholderTextColor='#4bebe5'
             style={styles.input}
           />
-          <Text style={styles.result}>Result: {result}</Text>
+          <View style={styles.resultWrapper}>
+            <Text style={[styles.result]}>Result:</Text>
+            <Text style={[styles.result, styles.resultText]}>{result}</Text>
+          </View>
         </View>
         <View style={styles.btnContainer}>
-          <View style={styles.btnConvert}>
-            <Button title='Convert' onPress={convertNumber} />
-          </View>
-          <View style={styles.btnClear}>
-            <Button title='Clear' fontSize='24' onPress={clearResult} />
-          </View>
+          <Button
+            iconName='redo-variant'
+            prime
+            press={convertNumber}
+            title='CONVERT'
+          />
+          <Button
+            simple
+            iconName='backup-restore'
+            press={clearResult}
+            title='CLEAR'
+          />
+        </View>
+        <View style={styles.signWrapper}>
+          <Text style={styles.signLabel}>Developed by:</Text>
+          <Text style={styles.sign}>Vasyl Hai</Text>
         </View>
       </View>
     </View>
